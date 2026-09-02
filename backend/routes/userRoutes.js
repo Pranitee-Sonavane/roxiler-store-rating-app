@@ -1,7 +1,6 @@
 const express = require("express");
 const pool = require("../config/db");
-const { registerUser } = require("../controllers/userController");
-
+const { registerUser, loginUser } = require("../controllers/userController");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -15,5 +14,6 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/register", registerUser);
+router.post("/login", loginUser);
 
 module.exports = router;

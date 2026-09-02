@@ -1,5 +1,6 @@
 const pool = require("../config/db");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const registerUser = async (req, res) => {
     const { name, email, address, password } = req.body;
@@ -81,4 +82,79 @@ const registerUser = async (req, res) => {
     }
 };
 
-module.exports = { registerUser };
+
+const loginUser = async (req, res) => {
+    const { email, password } = req.body;
+
+    // Required fields validation
+    if (!email || !password) {
+        return res.status(400).json({
+            message: "Email and password are required"
+        });
+    }
+
+    try {
+        // Find user by email
+        const result = await pool.query(
+            "SELECT * FROM users WHERE email = $1",
+            [email]
+        );
+
+        // Check if user exists
+        if (result.rows.length === 0) {
+            return res.status(401).json({
+                message: "Invalid email or password"
+            });
+        }
+
+        const user = result.rows[0];
+
+        // Compare entered password with hashed password
+        const isPasswordCorrect = await bcrypt.compare(
+            password,
+            user.password
+        );
+
+        // Check password
+        if (!isPasswordCorrect) {
+            return res.status(401).json({
+                message: "Invalid email or password"
+            });
+        }
+
+const token = jwt.sign(
+    {
+        id: user.id,
+        role: user.role
+    },
+    process.env.JWT_SECRET,
+    {
+        expiresIn: "1d"
+    }
+);
+return res.status(200).json({
+    message: "Login successful",
+    token,
+    user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        address: user.address,
+        role: user.role
+    }
+});        
+
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            message: "Database error"
+        });
+    }
+};
+
+
+module.exports = {
+    registerUser,
+    loginUser
+};

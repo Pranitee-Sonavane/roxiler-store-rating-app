@@ -4,8 +4,6 @@ const pool = require("./config/db");
 const app = express();
 const userRoutes = require("./routes/userRoutes");
 
-console.log("Pool:", pool);
-console.log("Pool query:", typeof pool.query);
 
 app.use(cors());
 app.use(express.json());

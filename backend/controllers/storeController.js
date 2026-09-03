@@ -1,7 +1,6 @@
 const pool = require("../config/db");
 
 
-// GET ALL STORES
 const getStores = async (req, res) => {
     const { search } = req.query;
 
@@ -53,7 +52,6 @@ const getStores = async (req, res) => {
 };
 
 
-// SUBMIT OR MODIFY RATING
 const submitRating = async (req, res) => {
     const { store_id, rating } = req.body;
 
@@ -70,7 +68,6 @@ const submitRating = async (req, res) => {
     }
 
     try {
-        // Check store exists
         const store = await pool.query(
             "SELECT id FROM stores WHERE id = $1",
             [store_id]
@@ -82,7 +79,6 @@ const submitRating = async (req, res) => {
             });
         }
 
-        // Insert or update rating
         const result = await pool.query(
             `INSERT INTO ratings (user_id, store_id, rating)
              VALUES ($1, $2, $3)

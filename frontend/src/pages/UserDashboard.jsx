@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import UpdatePassword from "../components/UpdatePassword";
 
 function UserDashboard() {
   const [stores, setStores] = useState([]);
@@ -6,6 +7,7 @@ function UserDashboard() {
   const [selectedRatings, setSelectedRatings] = useState({});
 
   const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const fetchStores = async () => {
     try {
@@ -69,6 +71,11 @@ function UserDashboard() {
 
       alert("Rating submitted successfully!");
 
+      setSelectedRatings({
+        ...selectedRatings,
+        [storeId]: rating,
+      });
+
       fetchStores();
     } catch (error) {
       console.error(error);
@@ -82,67 +89,193 @@ function UserDashboard() {
   };
 
   return (
-    <div>
-      <h1>Roxiler Store Rating</h1>
+    <div className="dashboard-page">
 
-      <button onClick={handleLogout}>
-        Logout
-      </button>
 
-      <h2>Stores</h2>
+      <header className="dashboard-header">
+        <div>
+          <h1>Roxiler</h1>
+          <span>Store Rating</span>
+        </div>
 
-      <input
-        type="text"
-        placeholder="Search by store name or address"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+        <div className="header-actions">
+          <span className="welcome-text">
+            Hi, {user?.name}
+          </span>
 
-      <div>
-        {stores.map((store) => (
-          <div key={store.id}>
+          <button
+            className="logout-button"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+        </div>
+      </header>
 
-            <h3>{store.name}</h3>
 
+      <main className="dashboard-content">
+
+        <div className="page-heading">
+          <div>
+            <h2>Find a Store</h2>
             <p>
-              Address: {store.address}
+              Discover stores and share your experience.
             </p>
-
-            <p>
-              Overall Rating: ⭐ {store.overall_rating}
-            </p>
-
-            <p>
-              Your Rating: ⭐ {store.user_rating || "Not rated"}
-            </p>
-
-            <div>
-              {[1, 2, 3, 4, 5].map((number) => (
-                <button
-                  key={number}
-                  onClick={() =>
-                    setSelectedRatings({
-                      ...selectedRatings,
-                      [store.id]: number,
-                    })
-                  }
-                >
-                  {number}
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={() => handleRating(store.id)}
-            >
-              Submit Rating
-            </button>
-
-            <hr />
-
           </div>
-        ))}
-      </div>
+        </div>
+
+
+        <div className="search-container">
+          <span className="search-icon">⌕</span>
+
+          <input
+            type="text"
+            placeholder="Search stores by name or address..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+
+
+        <div className="password-section">
+          <UpdatePassword />
+        </div>
+
+
+        <section className="stores-section">
+
+          <div className="section-heading">
+            <h3>Available Stores</h3>
+
+            <span className="store-count">
+              {stores.length}{" "}
+              {stores.length === 1 ? "store" : "stores"}
+            </span>
+          </div>
+
+          {stores.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">🏪</div>
+              <h3>No stores found</h3>
+              <p>
+                Try searching with a different name or address.
+              </p>
+            </div>
+          ) : (
+            <div className="store-grid">
+
+              {stores.map((store) => {
+
+                const selectedRating =
+                  selectedRatings[store.id];
+
+                const currentRating =
+                  selectedRating || store.user_rating;
+
+                return (
+                  <div
+                    className="store-card"
+                    key={store.id}
+                  >
+
+                    <div className="store-card-top">
+
+                      <div className="store-icon">
+                        🏪
+                      </div>
+
+                      <div>
+                        <h3>{store.name}</h3>
+
+                        <p className="store-address">
+                          📍 {store.address}
+                        </p>
+                      </div>
+
+                    </div>
+
+                    <div className="rating-summary">
+
+                      <div className="rating-item">
+                        <span className="rating-label">
+                          Overall Rating
+                        </span>
+
+                        <strong>
+                          ⭐ {store.overall_rating}
+                        </strong>
+                      </div>
+
+                      <div className="rating-item">
+                        <span className="rating-label">
+                          Your Rating
+                        </span>
+
+                        <strong>
+                          {store.user_rating
+                            ? `⭐ ${store.user_rating}`
+                            : "Not rated yet"}
+                        </strong>
+                      </div>
+
+                    </div>
+
+                    <div className="rate-section">
+
+                      <span className="rate-label">
+                        {store.user_rating
+                          ? "Update your rating"
+                          : "Rate this store"}
+                      </span>
+
+                      <div className="star-rating">
+
+                        {[1, 2, 3, 4, 5].map(
+                          (number) => (
+                            <button
+                              key={number}
+                              className={
+                                number <= currentRating
+                                  ? "star active"
+                                  : "star"
+                              }
+                              onClick={() =>
+                                setSelectedRatings({
+                                  ...selectedRatings,
+                                  [store.id]: number,
+                                })
+                              }
+                            >
+                              ★
+                            </button>
+                          )
+                        )}
+
+                      </div>
+
+                      <button
+                        className="rate-button"
+                        onClick={() =>
+                          handleRating(store.id)
+                        }
+                      >
+                        {store.user_rating
+                          ? "Update Rating"
+                          : "Submit Rating"}
+                      </button>
+
+                    </div>
+
+                  </div>
+                );
+              })}
+
+            </div>
+          )}
+
+        </section>
+
+      </main>
     </div>
   );
 }

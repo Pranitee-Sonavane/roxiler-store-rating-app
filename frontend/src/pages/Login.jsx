@@ -42,7 +42,6 @@ function Login() {
       } else {
         navigate("/user");
       }
-
     } catch (error) {
       console.error(error);
       alert("Unable to connect to server");
@@ -50,36 +49,61 @@ function Login() {
   };
 
   return (
-    <div>
-      <h1>Roxiler Store Rating</h1>
+    <div className="auth-page">
+      <div className="auth-card">
 
-      <h2>Login</h2>
+        <div className="auth-brand">
+          <h1>Roxiler Store Rating</h1>
+          <p>Sign in to continue</p>
+        </div>
 
-      <form onSubmit={handleLogin}>
+        <form className="auth-form" onSubmit={handleLogin}>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+          <div className="form-group">
+            <label>Email</label>
 
-        <br /><br />
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          <div className="form-group">
+            <label>Password</label>
 
-        <br /><br />
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
 
-        <button type="submit">
-          Login
-        </button>
+          <button
+            type="submit"
+            className="primary-button"
+          >
+            Login
+          </button>
 
-      </form>
+        </form>
+
+        <div className="auth-footer">
+          <p>Don't have an account?</p>
+
+          <button
+            className="auth-link"
+            onClick={() => navigate("/signup")}
+          >
+            Create an account
+          </button>
+        </div>
+
+      </div>
     </div>
   );
 }

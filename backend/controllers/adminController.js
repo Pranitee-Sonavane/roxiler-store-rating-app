@@ -111,7 +111,6 @@ const createStore = async (req, res) => {
     }
 
     try {
-        // Check owner exists
         const owner = await pool.query(
             "SELECT id, role FROM users WHERE id = $1",
             [owner_id]
